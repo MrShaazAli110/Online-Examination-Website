@@ -136,10 +136,10 @@ function AppContent() {
           marginTop: 'auto'
         }}>
           <div>
-            <strong>ExamSphere Pro</strong> — Enterprise MERN Online Examination Platform with Supabase PostgreSQL Compatibility
+            <strong>ExamSphere Pro</strong> — Serverless Proctored Online Examination System
           </div>
           <div style={{ marginTop: '0.35rem', fontSize: '0.75rem' }}>
-            Built with React, Node.js, Express & Supabase • AI Proctoring & Real-Time Integrity Shield Active
+            Built with React & Supabase Serverless Cloud Database • AI Proctoring & Real-Time Integrity Shield Active
           </div>
         </footer>
       )}

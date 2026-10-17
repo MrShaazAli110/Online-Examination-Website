@@ -1,6 +1,8 @@
-# ExamSphere Pro — Online Examination Platform (MERN + Supabase)
+# ExamSphere Pro — Serverless Proctored Online Examination System
 
-**ExamSphere Pro** is an enterprise-grade, AI-proctored online examination and certification platform built using the **MERN** stack (MongoDB/PostgreSQL/Supabase compatible, Express.js, React, Node.js) with native **Supabase PostgreSQL** compatibility.
+**ExamSphere Pro** is an enterprise-grade, AI-proctored online examination and certification platform built with a **100% Serverless Architecture** powered directly by **React** and **Supabase Cloud PostgreSQL**. 
+
+No backend server, middleware, or external third-party services are required. The application communicates directly and securely with Supabase using `@supabase/supabase-js` and PostgreSQL Row Level Security (RLS).
 
 ---
 
@@ -18,8 +20,8 @@
     - Short Answer / Text input
     - Code Snippet block with syntax styling
   - **Answer Controls**: Clear Response, Mark for Review, Next / Previous navigation, and Review & Submit confirmation dialog.
-- **Automated Instant Grading**:
-  - Instant score calculation with negative marking deductions.
+- **Automated Instant Grading Engine**:
+  - Direct client-to-database grading with positive marks and negative marking penalties.
   - Passing status badge, percentage, accuracy breakdowns.
   - Comprehensive question-by-question solution review with verified answers and examiner explanations.
 - **Verifiable Certificate of Achievement**:
@@ -32,33 +34,50 @@
 - **Fullscreen Enforcement**: Monitors fullscreen state and logs exits.
 - **Virtual AI Proctor Camera**: Real-time simulated AI webcam feed with facial tracking bounding box (`Face Locked 99.4%`) and focus state indicators.
 - **Clipboard & Context-Menu Protection**: Disables right-click, cut, copy, and unauthorized keyboard shortcuts.
-- **Server Audit Log**: Every violation is recorded with timestamp and reason in the database.
+- **Direct Audit Logging**: Every violation event is persisted directly to Supabase with timestamp, strike count, and violation type.
 
 ### 👩‍🏫 3. Examiner & Administrator Studio
-- **Role Switcher**: Switch seamlessly between **Student** and **Examiner** roles directly from the navigation bar.
+- **Role-Based Access Control**:
+  - **Student**: Take exams, track history, view certificates.
+  - **Examiner**: Create and author exams, manage questions, inspect analytics and candidate submissions.
+  - **Super Admin**: Manage user roles, authorize examiners, and audit platform security.
 - **Assessment Authoring Studio**:
   - Configure exam title, category, duration, passing percentage, negative marking penalties, tab-switch limits, and access codes.
   - Dynamic Question Builder: Add/remove options, designate multiple correct answers, attach code snippets, marks, and explanation text.
 - **Live Proctor & Cohort Analytics**:
   - Class pass rate, average score, and highest/lowest score metrics.
-  - **Question Difficulty Heatmap**: Progress bar visualization showing per-question accuracy across all candidates.
+  - **Question Difficulty Heatmap**: Visualization showing per-question accuracy across all candidates.
   - **Proctoring Integrity Audit Table**: Inspect every candidate's submission, score, time taken, and detailed violation audit log.
 
 ---
 
-## 🏗️ Architecture & Supabase Compatibility
+## 🏗️ 100% Serverless Architecture
 
-ExamSphere Pro provides a **dual-mode persistence architecture**:
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 React Client (Vite Single Page App)         │
+│  - Interactive Exam Room        - Anti-Cheating Proctor     │
+│  - Exam Authoring Studio        - Cohort Analytics Engine   │
+│  - Super Admin Console          - Certificate Generator     │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                Direct HTTPS & Web Crypto API
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  Supabase Cloud PostgreSQL                  │
+│  - profiles table (User roles & credentials)                │
+│  - exams table (Curriculum & configurations)                │
+│  - questions table (Multi-format question bank)             │
+│  - exam_attempts table (Submissions & violation audit logs) │
+│  - Row Level Security (RLS) Policies                        │
+└─────────────────────────────────────────────────────────────┘
+```
 
-1. **Supabase PostgreSQL Mode (Production)**:
-   - Connects directly to Supabase via `@supabase/supabase-js`.
-   - Uses relational schemas with Row Level Security (RLS) policies and indexes.
-   - Pre-written migration script: `server/supabase_schema.sql`.
-
-2. **Supabase In-Memory PostgreSQL Emulator (Development / Demo)**:
-   - Runs out of the box with zero database configuration.
-   - Pre-seeded with 4 certification assessments, question banks, and candidate submission history.
-   - The moment you add your Supabase credentials into `server/.env`, the server automatically switches to your live Supabase database!
+- **Zero Backend Maintenance**: No Express server, Node.js daemon, or proxy servers needed.
+- **Direct Database Connectivity**: Uses `@supabase/supabase-js` directly in the browser with public anon keys.
+- **Client-Side Hashing & Grading**: Web Crypto API (`crypto.subtle.digest('SHA-256')`) computes hashes securely in the browser.
+- **Deploy Anywhere**: The application builds to a pure static Single Page Application (SPA) ready for Vercel, Netlify, Cloudflare Pages, or GitHub Pages.
 
 ---
 
@@ -66,103 +85,41 @@ ExamSphere Pro provides a **dual-mode persistence architecture**:
 
 ### 1. Prerequisites
 - **Node.js** v18+ installed
-- **npm** v9+ installed
 
-### 2. Installation
+### 2. Run Locally
 From the root project directory:
 ```bash
-# Install dependencies for both server and client
-npm run install:all
-```
-
-Or install separately:
-```bash
-cd server && npm install
-cd ../client && npm install
-```
-
-### 3. Start the Application
-You can run both client and server:
-
-**Terminal 1 (Backend API):**
-```bash
-cd server
+# Start the serverless application directly
 npm run dev
-# Starts Express server on http://localhost:5000
 ```
-
-**Terminal 2 (React Frontend):**
-```bash
-cd client
-npm run dev
-# Starts Vite frontend on http://localhost:3000
-```
-
 Open your browser at: **`http://localhost:3000`**
 
+### 3. Production Build
+```bash
+npm run build
+```
+The optimized static build will be generated in `client/dist/`.
+
 ---
 
-## ⚡ Connecting to Your Supabase Project
+## ⚡ Supabase Configuration
 
-To connect ExamSphere Pro to your real Supabase PostgreSQL instance:
+The application is pre-configured to connect to Supabase. You can also connect your own Supabase project:
 
-1. **Create a project** on [supabase.com](https://supabase.com).
-2. Go to the **SQL Editor** in your Supabase dashboard.
-3. Open `server/supabase_schema.sql`, copy all SQL contents, and click **Run**.
-   - This creates `profiles`, `exams`, `questions`, and `exam_attempts` tables, sets RLS policies, indexes, and seeds the sample exams!
-4. Go to **Project Settings -> API** in Supabase and copy:
-   - `Project URL`
-   - `anon / public` key or `service_role` key
-5. Open `server/.env` and update:
+1. Create a project at [supabase.com](https://supabase.com).
+2. Run the SQL schema from `supabase/migrations/20261016000000_init_examination_schema.sql` in the Supabase SQL Editor.
+3. Configure your project credentials in `client/.env`:
    ```env
-   PORT=5000
-   NODE_ENV=development
-   SUPABASE_URL=https://your-project-id.supabase.co
-   SUPABASE_ANON_KEY=your-supabase-anon-or-service-key
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-supabase-publishable-or-anon-key
+   VITE_ADMIN_EXAMINER_KEY=EXAM_ADMIN_2026
+   VITE_SUPER_ADMIN_KEY=SUPER_ADMIN_2026
    ```
-6. Restart your server (`cd server && npm run dev`).
-   - The console will display: `⚡ Supabase Client initialized successfully` and the frontend navbar badge will switch to **"Supabase Live"**!
 
 ---
 
-## 📂 Project Structure
-
-```
-Online Eximation Website/
-├── client/                      # React Frontend (Vite)
-│   ├── src/
-│   │   ├── components/          # Navbar, ProctorCamera, AntiCheatModal, CertificateModal
-│   │   ├── pages/               # Dashboard, ExamCatalog, ExamRoom, ExamResult, ExamCreator, Analytics, StudentHistory
-│   │   ├── context/             # AuthContext (Role switching, Supabase health telemetry)
-│   │   ├── lib/                 # api.js (Frontend REST API client)
-│   │   ├── index.css            # Dark glassmorphic design system tokens & animations
-│   │   ├── App.jsx              # Main view orchestrator & navigation
-│   │   └── main.jsx
-│   ├── index.html               # Responsive HTML with Google Fonts
-│   ├── package.json
-│   └── vite.config.js           # Dev server with /api proxy to port 5000
-├── server/                      # Node.js + Express Backend
-│   ├── src/
-│   │   ├── config/              # supabase.js (Supabase client), db.js (persistence adapter)
-│   │   ├── controllers/         # examController, attemptController, analyticsController, authController
-│   │   ├── routes/              # examRoutes, attemptRoutes, analyticsRoutes, authRoutes
-│   │   ├── data/                # defaultData.js (High-quality seed exams & questions)
-│   │   └── server.js            # Express server entry point
-│   ├── supabase_schema.sql      # Supabase PostgreSQL schema with RLS & seed data
-│   ├── package.json
-│   └── .env.example
-├── package.json                 # Monorepo coordinator script
-└── README.md
-```
-
----
-
-## 🔒 Security & Proctoring Checklist
-- [x] Candidate answer masking during live test (correct answers and explanations are only delivered post-submission).
-- [x] Automatic grading with negative marking calculation.
-- [x] Window blur and visibility change listeners tracking tab switches.
-- [x] Fullscreen enforcement mode.
-- [x] Right-click context menu and copy shortcut interception.
-- [x] Automated submission on countdown timer expiry.
-- [x] Canvas cryptographically rendered verifiable completion certificates.
-- [x] Supabase Row Level Security (RLS) data policies.
+## 🔒 Security & Integrity Highlights
+- **Anti-Cheat Masking**: Student responses are evaluated against masked questions (correct answers and explanations are only retrieved upon completed submission).
+- **Proctoring Telemetry**: Tab-switch, window blur, and fullscreen breach listeners with strike counting.
+- **PostgreSQL Row Level Security (RLS)**: Enforces table policies at the database layer.
+- **Client Hashing**: Passwords stored as SHA-256 hashes in Supabase `profiles`.
