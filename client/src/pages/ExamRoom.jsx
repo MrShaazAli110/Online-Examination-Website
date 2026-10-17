@@ -5,18 +5,12 @@ import { ProctorCamera } from '../components/ProctorCamera';
 import { AntiCheatWarningModal } from '../components/AntiCheatWarningModal';
 import { 
   Clock, 
-  AlertTriangle, 
   Flag, 
-  CheckCircle, 
   RotateCcw, 
   ChevronLeft, 
   ChevronRight, 
   Send, 
-  Maximize, 
-  ShieldAlert,
-  Code2,
-  FileQuestion,
-  HelpCircle
+  Maximize
 } from 'lucide-react';
 
 export const ExamRoom = ({ examId, onExamCompleted, onExit }) => {

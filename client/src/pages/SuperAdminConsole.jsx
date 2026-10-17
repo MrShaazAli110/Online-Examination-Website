@@ -13,7 +13,6 @@ import {
   KeyRound, 
   ArrowRight,
   Database,
-  Lock,
   Search,
   Sparkles
 } from 'lucide-react';
